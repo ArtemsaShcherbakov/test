@@ -1,1 +1,71 @@
-вййцвйц уса
+const PROJECT_NAME_COLOR = "silver";
+
+const tdListElements = Array.from(document.getElementsByTagName("td"));
+
+const projectTitleList = tdListElements.filter(
+  (element) => element.style["background-color"] === PROJECT_NAME_COLOR,
+);
+
+projectTitleList.forEach((element, index) => {
+  element.align = "center";
+  element.style["background-color"] = "#ffc7c7";
+  element.parentNode.id = index;
+
+  const textTitleElement = element.getElementsByTagName("b")[0];
+  textTitleElement.style["font-size"] = "12px";
+});
+
+let indexSlice = [];
+const result = [];
+
+projectTitleList.forEach((td, index) => {
+  if (index === 0) {
+    indexSlice.push(td.parentNode.rowIndex + 1);
+
+    return;
+  }
+
+  indexSlice.push(td.parentNode.rowIndex - 1);
+  result.push(indexSlice);
+  indexSlice = [td.parentNode.rowIndex + 1];
+});
+
+const indexLastTr =
+  document.getElementById("new_strings").getElementsByTagName("tbody")[0]
+    .childNodes.length - 1;
+result.push([result.at(-1)[1] + 2, indexLastTr]);
+
+const viewList = (listId) => {
+  console.log(listId);
+  console.log(result[listId]);
+  const range = result[listId];
+
+  const listNode = Array.from(
+    document.getElementById("new_strings").getElementsByTagName("tbody")[0]
+      .childNodes,
+  ).filter((tr) => tr.rowIndex >= range[0] && tr.rowIndex <= range[1]);
+
+  const display = listNode[0].style.display === "none" ? "" : "none";
+
+  listNode.forEach((node) => {
+    node.style.display = display;
+  });
+};
+
+projectTitleList.forEach((td) => {
+  td.parentNode.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    viewList(td.parentNode.id);
+  });
+});
+
+console.log(result);
+
+document.querySelector("table")?.addEventListener("click", () => {
+  console.log("клик на таблице (после stopPropagation)");
+});
+document.body.addEventListener("click", () => {
+  console.log("клик на body (после stopPropagation)");
+});
